@@ -15,15 +15,27 @@ class Song < ActiveRecord::Base
   def genre_name
     self.genre ? self.genre.name : nil
   end 
-  def note_contents=(notes)
-    notes.each do |content|
-      if content.strip != ''
-        self.notes.build(content: content)
-      end
+  # def note_contents=(notes)
+  #   notes.each do |content|
+  #     if content.strip != ''
+  #       self.notes.build(content: content)
+  #     end
+  #   end
+  # end
+
+  # def note_contents
+  #   self.notes.map(&:content)
+  # end
+  def note_contents=(contents)
+    contents.each do |content|
+      note = Note.find_or_create_by(content: content)
+      self.notes << note #add to existing notes
     end
   end
-
+  
+  #notes getter
   def note_contents
-    self.notes.map(&:content)
+    contents = self.notes.map {|note| note.content}
+    contents.reject {|content| content.empty?} #ignore blank notes
   end
 end
